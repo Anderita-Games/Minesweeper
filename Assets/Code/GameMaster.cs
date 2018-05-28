@@ -22,6 +22,12 @@ public class GameMaster : MonoBehaviour {
 	public UnityEngine.UI.Text Flag_Count_Remaining;
 	public UnityEngine.UI.Text Time_Count;
 
+	//Settings User Interface
+	public GameObject Settings;
+	public UnityEngine.UI.Text Arena_Size_New;
+	public UnityEngine.UI.Text Bomb_Amount_New;
+	public UnityEngine.UI.Text Warning_Text;
+
 	//Bottom User Interface
 	float Line_Thicc = 6;
 	float Buffer = 40;
@@ -29,16 +35,10 @@ public class GameMaster : MonoBehaviour {
 	float Arena_Width;
 	float Arena_Height;
 
-	//Settings User Interface
-	public GameObject Settings;
-	public UnityEngine.UI.Text Arena_Size_New;
-	public UnityEngine.UI.Text Bomb_Amount_New;
-	public UnityEngine.UI.Text Warning_Text;
-
 	//Game Variables
 	public string[] Bomb_Cells;
 	int Arena_Size;
-	int Arena_Blocks_X;
+	int Arena_Blocks_X; 
 	int Arena_Blocks_Y;
 	public bool Game_Active = true;
 	public bool Flag_Mode = false;
@@ -46,7 +46,7 @@ public class GameMaster : MonoBehaviour {
 	public int Cells_Activated = 0;
 
 	void Start () {
-		if (PlayerPrefs.GetInt("Bomb Quantity") == null || PlayerPrefs.GetInt("Arena Size") == null || PlayerPrefs.GetInt("Arena Size") > 1000) {
+		if (PlayerPrefs.GetInt("Bomb Quantity") == 0 || PlayerPrefs.GetInt("Arena Size") == 0 || PlayerPrefs.GetInt("Arena Size") > 1000) {
 			PlayerPrefs.SetInt("Arena Size", 100);
 			PlayerPrefs.SetInt("Bomb Quantity", 10);
 		}
@@ -57,12 +57,12 @@ public class GameMaster : MonoBehaviour {
 
 		float Game_Arena_Average = (Game_Area.rect.width + Game_Area.rect.height) / 2.0f;
 		Arena_Blocks_X = (int) Mathf.Round((Game_Area.rect.width / Game_Arena_Average) * Mathf.Sqrt(PlayerPrefs.GetInt("Arena Size")));
-		Arena_Blocks_Y = (int) Mathf.Round((Game_Area.rect.height / Game_Arena_Average) * Mathf.Sqrt(PlayerPrefs.GetInt("Arena Size")));
+		Arena_Blocks_Y = (int) Mathf.Floor((Game_Area.rect.height / Game_Arena_Average) * Mathf.Sqrt(PlayerPrefs.GetInt("Arena Size")));
 		Arena_Size = Arena_Blocks_X * Arena_Blocks_Y;
 		Line_Thicc = (8.0f / Mathf.Sqrt(Arena_Size)) * Line_Thicc;
 		Arena_Width = (Game_Area.rect.width - (Buffer * 2));
 		Arena_Height = ((Arena_Width - Line_Thicc) / Arena_Blocks_X) * Arena_Blocks_Y;
-		
+		Debug.Log(Arena_Height);
 		Cell_Creation();
 		Line_Creation();
 	}
@@ -79,6 +79,9 @@ public class GameMaster : MonoBehaviour {
 			if (int.Parse(Flag_Count_Remaining.text) == 0 && Bombs_Flagged == PlayerPrefs.GetInt("Bomb Quantity") && Cells_Activated == Arena_Blocks_X * Arena_Blocks_Y - PlayerPrefs.GetInt("Bomb Quantity")) {
 				Game_Over("WIN!");
 			}
+		}
+		if (Input.GetMouseButtonDown(1)) {
+			Flag_Toggler();
 		}
 	}
 
